@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "DCBdHYv6/GOZn7VJxUFpXjY5tTdPh9cIdlvd7mRPk8w21Ldk3rNZqxlKLjMcxNuq84A3rlKwBnhHRKunppFbeA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\johnk\\source\\repos\\xmlmd\\xmlmd.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\johnk\\.nuget\\packages\\microsoft.csharp\\4.4.1\\microsoft.csharp.4.4.1.nupkg.sha512",
+    "C:\\Users\\johnk\\.nuget\\packages\\system.commandline\\2.0.0-beta1.20371.2\\system.commandline.2.0.0-beta1.20371.2.nupkg.sha512",
+    "C:\\Users\\johnk\\.nuget\\packages\\system.commandline.dragonfruit\\0.3.0-alpha.20371.2\\system.commandline.dragonfruit.0.3.0-alpha.20371.2.nupkg.sha512",
+    "C:\\Users\\johnk\\.nuget\\packages\\system.commandline.rendering\\0.3.0-alpha.20371.2\\system.commandline.rendering.0.3.0-alpha.20371.2.nupkg.sha512",
+    "C:\\Users\\johnk\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512"
+  ],
+  "logs": []
+}
