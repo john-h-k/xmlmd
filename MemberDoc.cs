@@ -26,7 +26,7 @@ namespace XmlMd
         public List<MemberDoc> ErrorStrings { get; set; } = new();
     }
 
-    public readonly struct MemberDoc
+    public readonly struct MemberDoc    
     {
         public readonly MemberDocKind Kind;
         public readonly string Name;

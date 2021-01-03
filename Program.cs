@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -17,19 +20,21 @@ namespace XmlMd
             assembly = @"C:\Users\reflectronic\source\repos\reflectronic\sympl\Sympl.Compiler\bin\Debug\net5.0\Sympl.Compiler";
             output = @"C:\Users\reflectronic\Documents\Test";
 #endif
+            if (Path.GetExtension(assembly) is not (".exe" or ".dll"))
+            {
+                assembly = File.Exists(assembly + ".dll") ? assembly + ".dll" : assembly + ".exe";
+            }
 
             if (xml is null)
             {
-                if (assembly.EndsWith(".exe") || assembly.EndsWith(".dll"))
-                {
-                    xml = assembly[..^4] + ".xml";
-                }
-                else
-                {
-                    xml = assembly + ".xml";
-                    assembly = File.Exists(assembly + ".dll") ? assembly + ".dll" : assembly + ".exe";
-                }
+                xml = Path.ChangeExtension(assembly, ".xml");
             }
+
+            var reference = MetadataReference.CreateFromFile(assembly, documentation: XmlDocumentationProvider.CreateFromFile(xml));
+
+            var comp = CSharpCompilation.Create("a", references: new[] { reference });
+
+            var assemblySymbol = (IAssemblySymbol) comp.GetAssemblyOrModuleSymbol(reference)!;
 
             var generator = new MdGenerator(assembly, xml);
             generator.GenerateMarkdown(output);
@@ -153,7 +158,7 @@ namespace XmlMd
 
             var asmType = Assembly.DefinedTypes.Where(info => info.FullName?.Replace('+', '.') == type.Type.Name).First();
 
-            var isStatic = asmType is TypeInfo { IsAbstract: true, IsSealed: true };
+            var isStatic = asmType is System.Reflection.TypeInfo { IsAbstract: true, IsSealed: true };
             var children = asmType.IsEnum ? Aliases[Enum.GetUnderlyingType(asmType)] : string.Join(", ", Enumerable.Concat(new[] { (asmType.IsValueType ? string.Empty : asmType.BaseType?.Name) }, asmType.ImplementedInterfaces.Select(ii => ii.Name)));
 
 
