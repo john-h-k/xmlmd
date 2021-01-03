@@ -14,8 +14,8 @@ namespace XmlMd
         public static void Main(string assembly, string output, string? xml = null)
         {
 #if DEBUG
-            assembly = @"C:\Users\johnk\source\repos\Voltium\artifacts\bin\sources\Voltium.Core\Debug\net5.0\Voltium.Core";
-            output = @"C:\Users\johnk\Documents\Test";
+            assembly = @"C:\Users\reflectronic\source\repos\reflectronic\sympl\Sympl.Compiler\bin\Debug\net5.0\Sympl.Compiler";
+            output = @"C:\Users\reflectronic\Documents\Test";
 #endif
 
             if (xml is null)
@@ -54,7 +54,7 @@ namespace XmlMd
             var doc = new XmlDocument();
             doc.Load(XmlName);
 
-            foreach (XmlNode node in (XmlNode)doc.ChildNodes[1]!)
+            foreach (XmlNode node in doc.ChildNodes[1]!)
             {
                 if (node.Name == "assembly")
                 {

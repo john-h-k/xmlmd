@@ -35,7 +35,7 @@ namespace XmlMd
 
         public static MemberDoc Parse(XmlNode node)
         {
-            var name = node.Attributes["name"]!.Value;
+            var name = node.Attributes?["name"]!.Value!;
 
             var innerText = node.InnerXml.Replace(new string(' ', 12), "\n");
 
