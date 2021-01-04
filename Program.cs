@@ -37,11 +37,18 @@ namespace XmlMd
 
             var assemblySymbol = (IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(reference)!;
 
+            DocumentationCoallator coallator = new(compilation, assemblySymbol);
+            coallator.GetDocumentedTypes();
+
+            /*
             var generator = new MdGenerator(compilation, assemblySymbol);
             generator.GenerateMarkdown(output);
+            */
         }
     }
+}
 
+    /*
     internal sealed class MdGenerator
     {
         Compilation Compilation;
@@ -107,12 +114,12 @@ namespace XmlMd
 
         private void GenerateMembers(XmlNode members, string output)
         {
-            var memberDocs = new List<MemberDoc>();
+            var memberDocs = new List<DocumentationComment>();
 
             foreach (XmlNode node in members.ChildNodes)
             {
                 Console.WriteLine(node.ToString());
-                memberDocs.Add(MemberDoc.Parse(node));
+                memberDocs.Add(DocumentationComment.Parse(node));
             }
 
             var types = memberDocs.Where(doc => doc.Kind == MemberDocKind.Type).ToDictionary(key => key.Name, key => new MemberDocType { Type = key });
@@ -132,7 +139,7 @@ namespace XmlMd
                 var typeName = name[0..dot];
                 if (!types.TryGetValue(typeName, out var type))
                 {
-                    type = new MemberDocType { Type = new MemberDoc(MemberDocKind.Type, typeName, string.Empty, null!) };
+                    type = new MemberDocType { Type = new DocumentationComment(MemberDocKind.Type, typeName, string.Empty, null!) };
                     types[typeName] = type;
                 }
 
@@ -269,7 +276,7 @@ namespace XmlMd
                 return MarkdownFactory.Link("##" + SanitiseLink(name), MarkdownFactory.InlineCode(name));
             }
 
-            MarkdownText[] FormatMethod(MethodBase method, MemberDoc doc)
+            MarkdownText[] FormatMethod(MethodBase method, DocumentationComment doc)
             {
                 var name = MethodName(method);
                 return new MarkdownText[]
@@ -463,3 +470,4 @@ namespace XmlMd
         }
     }
 }
+    */

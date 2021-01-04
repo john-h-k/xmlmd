@@ -4,9 +4,9 @@ using System.Collections.Immutable;
 
 namespace XmlMd
 {
-    public record DocumentedSymbol<TSymbol>(TSymbol Symbol, MemberDoc? Documentation) where TSymbol : ISymbol;
+    public record DocumentedSymbol<TSymbol>(TSymbol Symbol, DocumentationComment? Documentation) where TSymbol : ISymbol;
 
-    public sealed record DocumentedType(INamedTypeSymbol Symbol, MemberDoc? Documentation) : DocumentedSymbol<INamedTypeSymbol>(Symbol, Documentation)
+    public sealed record DocumentedType(INamedTypeSymbol Symbol, DocumentationComment? Documentation) : DocumentedSymbol<INamedTypeSymbol>(Symbol, Documentation)
     {
         public ImmutableArray<DocumentedSymbol<IFieldSymbol>> Fields { get; init; }
         public ImmutableArray<DocumentedSymbol<IMethodSymbol>> Methods { get; init; }
@@ -45,7 +45,7 @@ namespace XmlMd
                     ProcessMembers(symbol, builder);
                 }
             }
-            else if (nsOrType is INamedTypeSymbol type)
+            else if (nsOrType is INamedTypeSymbol { DeclaredAccessibility: Accessibility.Public or Accessibility.Protected or Accessibility.ProtectedOrInternal } type)
             {
                 builder.Add(CoallateTypeWithDocumentation(type));
 
@@ -65,7 +65,7 @@ namespace XmlMd
 
             foreach (var member in type.GetMembers())
             {
-                var xml = MemberDoc.Parse(member.GetDocumentationCommentXml());
+                var xml = DocumentationComment.Parse(member.GetDocumentationCommentXml());
 
                 switch (member)
                 {
@@ -84,7 +84,7 @@ namespace XmlMd
                 }
             }
 
-            return new DocumentedType(type, MemberDoc.Parse(type.GetDocumentationCommentXml()))
+            return new DocumentedType(type, DocumentationComment.Parse(type.GetDocumentationCommentXml()))
             {
                 Fields = fields.ToImmutable(),
                 Methods = methods.ToImmutable(),

@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -179,7 +179,7 @@ namespace XmlMd
         private static TypeParamRefKind TypeParamKind(string arg)
             => arg.StartsWith("``") ? TypeParamRefKind.Method : (arg.StartsWith("`") ? TypeParamRefKind.Type : TypeParamRefKind.None);
 
-        public MethodBase DemangleMethodName(Type type, MemberDoc doc)
+        public MethodBase DemangleMethodName(Type type, DocumentationComment doc)
         {
             string noRet = doc.Name;
             Type? retType = null;
@@ -275,15 +275,15 @@ namespace XmlMd
 
         private string GetLastSegment(string s) => s[(s.LastIndexOf('.') + 1)..];
 
-        public FieldInfo DemangleFieldName(Type type, MemberDoc doc)
+        public FieldInfo DemangleFieldName(Type type, DocumentationComment doc)
         {
             var field = GetLastSegment(doc.Name);
             return type.GetField(field, BindAll) ?? throw new MissingFieldException(field);
         }
 
-        public PropertyInfo DemanglePropertyName(Type type, MemberDoc doc)
+        public PropertyInfo DemanglePropertyName(Type type, DocumentationComment doc)
         {
-            if (doc.Name.IndexOf('(') != -1 /* indexer */)
+            if (doc.Name.IndexOf('(') != -1 /* indexer )
             {
                 var (name, numTypeParams, types) = GetTypesForInvokable(type, doc.Name);
                 return type.GetProperty(name, BindAll, null, null, types, null) ?? throw new MissingMemberException(name);
@@ -293,10 +293,10 @@ namespace XmlMd
             return type.GetProperty(prop, BindAll) ?? throw new MissingMemberException(prop);
         }
 
-        public EventInfo DemangleEventName(Type type, MemberDoc doc)
+        public EventInfo DemangleEventName(Type type, DocumentationComment doc)
         {
             var @event = GetLastSegment(doc.Name);
             return type.GetEvent(@event, BindAll) ?? throw new MissingMemberException(@event);
         }
     }
-}
+}*/
