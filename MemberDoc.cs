@@ -1,4 +1,7 @@
 
+using Microsoft.CodeAnalysis.CSharp;
+
+using System;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -33,13 +36,16 @@ namespace XmlMd
         public readonly string Content;
         public readonly XmlNode ContentNode;
 
-        public static MemberDoc Parse(XmlNode node)
+        public static MemberDoc? Parse(string? node)
         {
+            throw new NotImplementedException();
+            /*
             var name = node.Attributes?["name"]!.Value!;
 
             var innerText = node.InnerXml.Replace(new string(' ', 12), "\n");
 
-            return new MemberDoc((MemberDocKind)name[0], /* skip ID and colon */ name[2..], innerText, node);
+            return new MemberDoc((MemberDocKind)name[0], /* skip ID and colon name[2..], innerText, node);
+            */
         }
 
         public MemberDoc(MemberDocKind kind, string name, string content, XmlNode contentNode)

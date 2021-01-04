@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -32,30 +33,29 @@ namespace XmlMd
 
             var reference = MetadataReference.CreateFromFile(assembly, documentation: XmlDocumentationProvider.CreateFromFile(xml));
 
-            var comp = CSharpCompilation.Create("a", references: new[] { reference });
+            var compilation = CSharpCompilation.Create("a", references: new[] { reference });
 
-            var assemblySymbol = (IAssemblySymbol) comp.GetAssemblyOrModuleSymbol(reference)!;
+            var assemblySymbol = (IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(reference)!;
 
-            var generator = new MdGenerator(assembly, xml);
+            var generator = new MdGenerator(compilation, assemblySymbol);
             generator.GenerateMarkdown(output);
         }
     }
 
     internal sealed class MdGenerator
     {
-        private string AssemblyName;
-        private string XmlName;
-        private Assembly Assembly;
+        Compilation Compilation;
+        IAssemblySymbol Assembly;
 
-        public MdGenerator(string assemblyName, string xmlName)
+        public MdGenerator(Compilation compilation, IAssemblySymbol assembly)
         {
-            AssemblyName = assemblyName;
-            XmlName = xmlName;
-            Assembly = Assembly.LoadFrom(AssemblyName);
+            Assembly = assembly;
+            Compilation = compilation;
         }
 
-        public void GenerateMarkdown(string output)
+        public void GenerateMarkdown(string outputPath)
         {
+
             var doc = new XmlDocument();
             doc.Load(XmlName);
 
@@ -69,9 +69,41 @@ namespace XmlMd
                 }
 
                 Debug.Assert(node.Name == "members");
-                GenerateMembers(node, output);
+                GenerateMembers(node, outputPath);
             }
         }
+
+        private void GenerateMembers(INamespaceOrTypeSymbol nsOrType)
+        {
+            if (nsOrType is ITypeSymbol type)
+            {
+                GenerateMembers(type);
+            }
+            else
+            {
+                foreach (var member in nsOrType.GetMembers())
+                {
+                    if (member is INamespaceOrTypeSymbol nsOrTypeMember)
+                    {
+                        GenerateMembers(nsOrTypeMember);
+                    }
+                }
+            }
+        }
+
+        private DocumentedType<ITypeSymbol> CreateDocumentedType(ITypeSymbol type)
+        {
+            foreach (var member in type.GetMembers())
+            {
+                switch (member)
+                {
+                    case IMethodSymbol method:
+
+                        break;
+                }
+            }
+        }
+
 
         private void GenerateMembers(XmlNode members, string output)
         {
@@ -261,25 +293,6 @@ namespace XmlMd
 
             string SanitiseLink(string str) => str.Replace(" ", "");
         }
-    }
-
-    public sealed class DocumentedType
-    {
-        public DocumentedType((Type Info, MemberDoc Doc) type, IList<(MethodBase Info, MemberDoc Doc)> methods, IList<(PropertyInfo Info, MemberDoc Doc)> properties, IList<(FieldInfo Info, MemberDoc Doc)> field, IList<(EventInfo Info, MemberDoc Doc)> @event)
-        {
-            Type = type;
-            Methods = methods;
-            Properties = properties;
-            Field = field;
-            Event = @event;
-        }
-
-        public (Type Info, MemberDoc Doc) Type { get; }
-
-        public IList<(MethodBase Info, MemberDoc Doc)> Methods { get; }
-        public IList<(PropertyInfo Info, MemberDoc Doc)> Properties { get; }
-        public IList<(FieldInfo Info, MemberDoc Doc)> Field { get; }
-        public IList<(EventInfo Info, MemberDoc Doc)> Event { get; }
     }
 
     public interface ITypeWriter
