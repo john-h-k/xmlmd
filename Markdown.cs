@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -6,14 +7,14 @@ namespace XmlMd
 {
     public sealed class MarkdownDocument
     {
-        private StringWriter _output;
+        private TextWriter _output;
 
         public MarkdownDocument()
         {
-            _output = new();
+            _output = new StringWriter();
         }
 
-        public void AddHeader(int level, MarkdownText text)
+        public void AddHeader(int level, MarkdownText? text)
         {
             _output.Write(new string('#', level));
             _output.Write(' ');
@@ -22,7 +23,7 @@ namespace XmlMd
 
         public void AddNewline(int count = 1) => _output.Write(new string('\n', count));
 
-        public void AddList(ListKind kind, IEnumerable<MarkdownText> elements)
+        public void AddList(ListKind kind, IEnumerable<MarkdownText?> elements)
         {
             int i = 0;
             foreach (var element in elements)
@@ -33,14 +34,14 @@ namespace XmlMd
             }
         }
 
-        public void AddTable(ICollection<MarkdownText> header, IList<IList<MarkdownText>> table)
+        public void AddTable(ICollection<MarkdownText?> header, IList<IList<MarkdownText?>> table)
         {
             int i = 0;
             var lengths = new int[table.Count];
 
             foreach (var row in table[0])
             {
-                lengths[i++] = table.Max(row => row[i].Text.Length);
+                lengths[i++] = table.Max(row => row[i]?.Text.Length) ?? 0;
             }
 
             i = 0;
@@ -69,16 +70,16 @@ namespace XmlMd
             }
         }
 
-        public void AddText(IEnumerable<MarkdownText> texts)
+        public void AddText(IEnumerable<MarkdownText?> texts)
         {
             foreach (var text in texts)
             {
                 AddText(text);
             }
         }
-        public void AddText(MarkdownText text) => _output.Write(text);
+        public void AddText(MarkdownText? text) => _output.Write(text);
 
-        public void AddImage(MarkdownText altText, string href)
+        public void AddImage(MarkdownText? altText, string href)
         {
             _output.Write('!');
             _output.Write('[');
@@ -89,10 +90,10 @@ namespace XmlMd
             _output.Write(')');
         }
 
-        public override string ToString() => _output.ToString();
+        public override string? ToString() => _output.ToString();
     }
 
-    public static class LanguageID
+    public static class LanguageId
     {
         public const string CSharp = "cs";
         public const string CPlusPlus = "cpp";
@@ -110,12 +111,13 @@ namespace XmlMd
 
         public override string ToString() => Text;
 
-        public static implicit operator MarkdownText(string text) => new MarkdownText(text);
+        [return: NotNullIfNotNull("text")]
+        public static implicit operator MarkdownText?(string? text) => text is null ? null : new MarkdownText(text);
     }
 
     public class MarkdownFactory
     {
-        public static MarkdownText NewLine { get;} = "\n";
+        public static MarkdownText NewLine { get; } = "\n";
         public static MarkdownText NewLines(int count) => new string('\n', count);
         public static MarkdownText Plain(string text) => text;
         public static MarkdownText Header(int level, MarkdownText text) => new(new string('#', level) + " " + text.Text);
